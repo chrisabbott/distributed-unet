@@ -2,9 +2,11 @@ import tensorflow as tf
 
 
 class UNet:
-    def __init__(self, input_tensor, num_classes):
+    def __init__(self, input_tensor, num_classes, is_training):
         self.classes = num_classes
+
         self.model = self._model(input_tensor)
+        self.is_training = is_training
 
     def _maxpool2d(self, X, kernel, stride, name='maxpool2d'):
         with tf.compat.v1.variable_scope(name):
@@ -14,7 +16,8 @@ class UNet:
                 strides=[1, stride, stride, 1],
                 padding='SAME')
 
-    def _conv2d(self, X, filters, kernel, stride, name='conv2d'):
+    def _conv2d(self, X, filters, kernel, stride,
+                padding='VALID', activation=tf.nn.relu, name='conv2d'):
         with tf.compat.v1.variable_scope(name):
             filters = tf.Variable(
                 tf.random.normal([kernel, kernel, X.shape[-1], filters]))
@@ -22,12 +25,14 @@ class UNet:
                 input=X,
                 filters=filters,
                 strides=[stride, stride],
-                padding='VALID')
+                padding=padding)
             biases = tf.Variable(tf.random.normal([X.shape[-1]]))
             X = tf.nn.bias_add(X, biases)
-            return tf.nn.relu(X)
+            tf.logging.info("X.shape: {}".format(X.shape))
+            return activation(X)
 
-    def _conv2d_transpose(self, X, filters, kernel, stride, factor=2, name='conv2d_transpose'):
+    def _conv2d_transpose(self, X, filters, kernel, stride, factor=2,
+                          padding='VALID', activation=tf.nn.relu, name='conv2d_transpose'):
         with tf.compat.v1.variable_scope(name):
             filters = tf.Variable(
                 tf.random.normal([kernel, kernel, X.shape[-1], filters]))
@@ -35,15 +40,16 @@ class UNet:
                 input=X,
                 filters=filters,
                 output_shape=[
-                    X.shape[0],
+                    -1,
                     X.shape[1] * factor,
                     X.shape[2] * factor,
                     X.shape[-1] // factor],
                 strides=[stride, stride],
-                padding='VALID')
+                padding=padding)
             biases = tf.Variable(tf.random.normal([X.shape[-1]]))
             X = tf.nn.bias_add(X, biases)
-            return tf.nn.relu(X)
+            tf.logging.info("X.shape: {}".format(X.shape))
+            return activation(X)
 
     def _crop_concat(self, A, B, name='crop_concat'):
         with tf.compat.v1.variable_scope(name):
@@ -96,20 +102,14 @@ class UNet:
                     conv7 = self._conv2d(skip7, filters=128, kernel=3, stride=1)
                     conv7 = self._conv2d(conv7, filters=128, kernel=3, stride=1)
                 with tf.compat.v1.variable_scope('ExpansiveBlock_3'):
-                    conv8 = self._conv2d_transpose(conv7, filters=64, kernel=2, stride=1)
+                    conv8 = self._conv2d_transpose(conv7, filters=64, kernel=2, stride=1, factor=3)
                     skip8 = self._crop_concat(conv0, conv8)
                     conv8 = self._conv2d(skip8, filters=64, kernel=3, stride=1)
                     conv8 = self._conv2d(conv8, filters=64, kernel=3, stride=1)
-                    conv8 = self._conv2d(conv8, filters=self.classes, kernel=1, stride=1)
-                    return conv8
-
-
-def main():
-    batch_size = 1
-    img_size = 572
-    img_dims = 3
-    X = tf.compat.v1.placeholder(dtype=tf.float32, shape=(batch_size, img_size, img_size, img_dims))
-    net = UNet(input_tensor=X, num_classes=4).model
+            with tf.compat.v1.variable_scope('Output'):
+                conv9 = self._conv2d_transpose(conv8, filters=64, kernel=2, stride=1)
+                conv9 = self._conv2d(conv9, filters=self.classes, kernel=1, stride=1)
+                return conv9
 
 
 if __name__ == '__main__':
