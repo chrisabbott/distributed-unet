@@ -1,9 +1,11 @@
 import click
 import cv2
-from larcv import larcv
+import os
 import numpy as np
-import ROOT
-from ROOT import TChain
+import numpy.ma as ma
+import sys
+
+np.set_printoptions(threshold=sys.maxsize)
 
 
 @click.group(chain=True)
@@ -12,31 +14,31 @@ def cli():
 
 
 @cli.command(name="preview")
-@click.option("--filename", "-f", help="Path to .root file")
-@click.option("--channel", "-c", help="Channel name")
-def preview(filename, channel):
-    # Create TChain for data image
-    chain_image2d = ROOT.TChain('image2d_data_tree')
-    chain_image2d.AddFile(filename)
+@click.option("--filename", "-f", required=True, help="Path to .npy file")
+def preview(filename):
+    data = np.load(filename)
+    for index, image in enumerate(data):
+        cv2.imshow("Image preview {}".format(index), image)
+        k = cv2.waitKey(0)
+        if k == 27:
+            cv2.destroyAllWindows()
+            exit()
 
-    # Create TChain for label image2d_data_tree
-    chain_label2d = ROOT.TChain('image2d_segment_tree')
-    chain_label2d.AddFile(filename)
 
-    entry = -1
-    if entry < 0:
-        entry = np.random.randint(0, chain_label2d.GetEntries())
-
-    chain_label2d.GetEntry(entry)
-    chain_image2d.GetEntry(entry)
-
-    image2d = larcv.as_ndarray(chain_image2d.image2d_data_branch.as_vector().front())
-    label2d = larcv.as_ndarray(chain_label2d.image2d_segment_branch.as_vector().front())
-
-    cv2.imshow("Image preview", image2d)
-    cv2.waitKey(0)
-    cv2.imshow("Segmentation preview", label2d)
-    cv2.waitKey(0)
+@cli.command(name="compare")
+@click.option("--filename1", "-f1", required=True, help="Path to .npy file")
+@click.option("--filename2", "-f2", required=True, help="Path to .npy file")
+def preview(filename1, filename2):
+    data1 = np.load(filename1)
+    data2 = np.load(filename2)
+    for index, _ in enumerate(data1):
+        cv2.imshow("File1 preview {}".format(index), data1[index])
+        cv2.imshow("File2 preview {}".format(index), data2[index])
+        k = cv2.waitKey(0)
+        if k == 27:
+            cv2.destroyAllWindows()
+            exit()
+        cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
