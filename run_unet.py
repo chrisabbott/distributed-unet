@@ -7,6 +7,10 @@ from estimator import model_fn
 from utils import load_npy, LoggingLevels
 
 
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+
+
 @click.group(chain=True)
 def cli():
     pass
@@ -25,7 +29,7 @@ def cli():
               help="Desired batch size for training")
 @click.option("--epochs", "-e", default=20,
               help="Number of epochs to train for")
-@click.option("--learning-rate", "-lr", default=1.0e-4,
+@click.option("--learning-rate", "-lr", default=1.0e-3,
               help="Initial learning rate for training")
 @click.option("--num-classes", "-nc", default=3,
               help="Number of classes for segmentation")
@@ -43,6 +47,7 @@ def train(images, labels, logging_level, output_dir, batch_size, epochs, learnin
     model = tf.estimator.Estimator(
         model_fn=model_fn,
         model_dir=output_dir,
+        config=tf.contrib.learn.RunConfig(session_config=config),
         params={'learning_rate': learning_rate,
                 'num_classes': num_classes})
 
