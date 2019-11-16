@@ -1,4 +1,5 @@
 import click
+import numpy as np
 import sys
 import tensorflow as tf
 
@@ -24,7 +25,7 @@ def cli():
               help="Desired batch size for training")
 @click.option("--epochs", "-e", default=20,
               help="Number of epochs to train for")
-@click.option("--learning-rate", "-lr", default=1.0e-2,
+@click.option("--learning-rate", "-lr", default=1.0e-4,
               help="Initial learning rate for training")
 @click.option("--num-classes", "-nc", default=3,
               help="Number of classes for segmentation")
@@ -36,7 +37,7 @@ def train(images, labels, logging_level, output_dir, batch_size, epochs, learnin
     # Load data
     train_X = load_npy(images)
     train_y = load_npy(labels)
-    num_train_steps = int(train_X.shape[0] / batch_size)
+    num_train_steps = int(train_X.shape[0] // batch_size)
 
     # Build the Estimator
     model = tf.estimator.Estimator(

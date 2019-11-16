@@ -15,9 +15,14 @@ def model_fn(features, labels, mode, params):
 
     #loss_op = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
     #    logits=logits_train, labels=tf.cast(labels, dtype=tf.int32)))
-    cce = tf.keras.losses.CategoricalCrossentropy()
-    loss_op = cce(y_true=tf.cast(labels, dtype=tf.int32),
-                  y_pred=tf.nn.softmax(logits_train))
+    #cce = tf.keras.losses.CategoricalCrossentropy()
+    #loss_op = cce(y_true=tf.cast(labels, dtype=tf.int32),
+    #              y_pred=tf.nn.softmax(logits_train))
+    #loss_op = tf.reduce_mean(
+    #    tf.losses.softmax_cross_entropy(onehot_labels=labels, logits=logits_train))
+    loss_op = tf.reduce_mean(
+        tf.nn.sparse_softmax_cross_entropy_with_logits(
+            labels=tf.argmax(labels, axis=-1), logits=logits_train))
     optimizer = tf.train.AdamOptimizer(learning_rate=params['learning_rate'])
     train_op = optimizer.minimize(loss_op, global_step=tf.train.get_global_step())
 
