@@ -12,7 +12,8 @@ class LoggingLevels(Enum):
 
 
 def load_npy(filename):
-    assert filename.endswith(".npy"), tf.logging.ERROR("Expected .npy file as input.")
+    assert filename.endswith(".npy"), tf.logging.ERROR(
+        "Expected .npy file as input.")
     try:
         loaded = np.load(filename)
     except IOError as e:

@@ -1,3 +1,4 @@
-data
-.terraform
 __pycache__
+.models
+.terraform
+data
