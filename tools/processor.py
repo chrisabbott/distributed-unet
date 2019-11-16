@@ -15,7 +15,6 @@ np.set_printoptions(threshold=sys.maxsize)
 def cli():
     pass
 
-
 @cli.command(name="root-to-npy")
 @click.option("--filename", "-i", required=True, help="Path to .root file")
 def root_to_npy(filename):
@@ -34,28 +33,34 @@ def root_to_npy(filename):
 
     for sample in range(chain_image2d.GetEntries()):
         chain_image2d.GetEntry(sample)
-        image = np.copy(larcv.as_ndarray(chain_image2d.image2d_data_branch.as_vector().front()))
+        image = np.copy(
+            larcv.as_ndarray(
+                chain_image2d.image2d_data_branch.as_vector().front()))
         _X.append(image)
 
-    X = np.reshape(np.stack(_X, axis=0), (len(_X), _X[0].shape[0], _X[0].shape[1], 1))
+    X = np.reshape(np.stack(_X, axis=0),
+                   (len(_X), _X[0].shape[0], _X[0].shape[1], 1))
     print("Saving X ...")
     print("X.shape = {}".format(X.shape))
     np.save("{}_X.npy".format(basename), X)
 
     for sample in range(chain_label2d.GetEntries()):
         chain_label2d.GetEntry(sample)
-        label = larcv.as_ndarray(chain_label2d.image2d_segment_branch.as_vector().front())
+        label = larcv.as_ndarray(
+            chain_label2d.image2d_segment_branch.as_vector().front())
         _label = []
         for class_index in range(3):
-            _label.append(np.multiply(np.ones_like(label), (label == class_index).astype(int)))
+            _label.append(
+                np.multiply(np.ones_like(label),
+                            (label == class_index).astype(int)))
         __label = (np.stack(_label, axis=-1))
-        _y.append(__label.astype(np.uint8)*255)
+        _y.append(__label.astype(np.uint8) * 255)
 
-    y = np.reshape(np.stack(_y, axis=0), (len(_y), _y[0].shape[0], _y[0].shape[1], 3))
+    y = np.reshape(np.stack(_y, axis=0),
+                   (len(_y), _y[0].shape[0], _y[0].shape[1], 3))
     print("Saving y ...")
     print("y.shape: {}".format(y.shape))
     np.save("{}_y.npy".format(basename), y)
-
 
 
 if __name__ == '__main__':

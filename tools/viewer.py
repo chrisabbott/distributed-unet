@@ -12,7 +12,6 @@ np.set_printoptions(threshold=sys.maxsize)
 def cli():
     pass
 
-
 @cli.command(name="preview")
 @click.option("--filename", "-f", required=True, help="Path to .npy file")
 def preview(filename):
@@ -23,7 +22,6 @@ def preview(filename):
         if k == 27:
             cv2.destroyAllWindows()
             exit()
-
 
 @cli.command(name="compare")
 @click.option("--filename1", "-f1", required=True, help="Path to .npy file")
