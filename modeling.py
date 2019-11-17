@@ -29,8 +29,9 @@ class UNet:
         with tf.compat.v1.variable_scope(name):
             _, _, _, channels = tf.unstack(tf.compat.v1.shape(input_tensor))
             filter = tf.Variable(
-                tf.truncated_normal(shape=[kernel, kernel, input_tensor.shape[3], filters],
-                                    stddev=0.1))
+                tf.truncated_normal(
+                    shape=[kernel, kernel, input_tensor.shape[3], filters],
+                    stddev=0.1))
             X = tf.nn.conv2d(
                 input=input_tensor,
                 filter=filter,
@@ -56,8 +57,9 @@ class UNet:
             batch_size, _, _, channels = tf.unstack(
                 tf.compat.v1.shape(input_tensor))
             filter = tf.Variable(
-                tf.truncated_normal(shape=[kernel, kernel, filters, input_tensor.shape[3]],
-                                    stddev=0.1))
+                tf.truncated_normal(
+                    shape=[kernel, kernel, filters, input_tensor.shape[3]],
+                    stddev=0.1))
             X = tf.nn.conv2d_transpose(
                 input=input_tensor,
                 filters=filter,

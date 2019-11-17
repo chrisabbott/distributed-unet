@@ -15,6 +15,7 @@ np.set_printoptions(threshold=sys.maxsize)
 def cli():
     pass
 
+
 @cli.command(name="root-to-npy")
 @click.option("--filename", "-i", required=True, help="Path to .root file")
 def root_to_npy(filename):

@@ -8,7 +8,7 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 
 
-@click.group(chain=True)
+@click.group()
 @click.option("--images",
               "-X",
               required=True,
@@ -19,7 +19,7 @@ config.gpu_options.allow_growth = True
               help="Path to .npy testing labels file")
 @click.option("--logging-level",
               "-l",
-              default='INFO',
+              default='ERROR',
               help="Logging verbosity level")
 @click.option("--output-dir",
               "-o",
@@ -46,16 +46,8 @@ config.gpu_options.allow_growth = True
               default=3,
               help="Number of classes for segmentation")
 @click.pass_context
-def cli(ctx,
-        images,
-        labels,
-        logging_level,
-        output_dir,
-        test_steps,
-        batch_size,
-        learning_rate,
-        epochs,
-        num_classes):
+def cli(ctx, images, labels, logging_level, output_dir, test_steps, batch_size,
+        learning_rate, epochs, num_classes):
     # Initialize logging and create folders
     tf.compat.v1.logging.set_verbosity(LoggingLevels[logging_level].value)
     tf.io.gfile.makedirs(output_dir)
@@ -81,32 +73,34 @@ def cli(ctx,
         'model': model,
         'batch_size': batch_size,
         'epochs': epochs,
-        'test_steps': test_steps}
+        'test_steps': test_steps
+    }
+
 
 @cli.command(name="evaluate")
 @click.pass_context
 def evaluate(ctx):
     # Construct the input function
-    input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(
-        x=ctx.obj['X'],
-        y=ctx.obj['y'],
-        shuffle=False)
+    input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(x=ctx.obj['X'],
+                                                            y=ctx.obj['y'],
+                                                            shuffle=False)
 
     # Evaluate the Model
     ctx.obj['model'].evaluate(input_fn, steps=ctx.obj['test_steps'])
+
 
 @cli.command(name="predict")
 @click.pass_context
 def predict(ctx):
     # Construct the input function
-    input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(
-        x=ctx.obj['X'],
-        y=ctx.obj['y'],
-        shuffle=False)
+    input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(x=ctx.obj['X'],
+                                                            y=ctx.obj['y'],
+                                                            shuffle=False)
 
     # Evaluate the Model
     for item in ctx.obj['model'].predict(input_fn):
         print(item)
+
 
 @cli.command(name="train")
 @click.pass_context
