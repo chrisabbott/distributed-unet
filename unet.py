@@ -35,7 +35,7 @@ config.gpu_options.allow_growth = True
               help="Desired batch size for training")
 @click.option("--learning-rate",
               "-lr",
-              default=1.0e-3,
+              default=1.0e-4,
               help="Initial learning rate for training")
 @click.option("--epochs",
               "-e",
@@ -77,18 +77,6 @@ def cli(ctx, images, labels, logging_level, output_dir, test_steps, batch_size,
     }
 
 
-@cli.command(name="evaluate")
-@click.pass_context
-def evaluate(ctx):
-    # Construct the input function
-    input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(x=ctx.obj['X'],
-                                                            y=ctx.obj['y'],
-                                                            shuffle=False)
-
-    # Evaluate the Model
-    ctx.obj['model'].evaluate(input_fn, steps=ctx.obj['test_steps'])
-
-
 @cli.command(name="predict")
 @click.pass_context
 def predict(ctx):
@@ -116,6 +104,26 @@ def train(ctx):
     # Train the Model
     num_train_steps = int(ctx.obj['X'].shape[0] // ctx.obj['batch_size'])
     ctx.obj['model'].train(input_fn, steps=num_train_steps)
+
+@cli.command(name="train-and-evaluate")
+@click.pass_context
+def train_and_evaluate(ctx):
+    # Construct the input function
+    train_input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(x=ctx.obj['X'],
+                                                                  y=ctx.obj['y'],
+                                                                  batch_size=ctx.obj['batch_size'],
+                                                                  num_epochs=ctx.obj['epochs'],
+                                                                  shuffle=True)
+    eval_input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(x=ctx.obj['X'],
+                                                                 y=ctx.obj['y'],
+                                                                 shuffle=False)
+
+    # Train and evaluate the Model
+    num_train_steps = int(ctx.obj['X'].shape[0] // ctx.obj['batch_size'])
+    tf.estimator.train_and_evaluate(
+            estimator=ctx.obj['model'],
+            train_spec=tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=num_train_steps),
+            eval_spec=tf.estimator.EvalSpec(input_fn=eval_input_fn))
 
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@ class UNet:
             kernel,
             stride,
             padding="SAME",
-            activation=tf.nn.relu,
+            activation=tf.nn.tanh,
             name="conv2d",
     ):
         with tf.compat.v1.variable_scope(name):
@@ -39,7 +39,8 @@ class UNet:
                 padding=padding,
             )
             biases = tf.Variable(tf.random.normal([X.shape[-1]]))
-            return activation(tf.nn.bias_add(X, biases))
+            activated = activation(tf.nn.bias_add(X, biases))
+            return tf.compat.v1.layers.batch_normalization(activated)
 
     def _conv2d_transpose(
             self,
@@ -49,7 +50,7 @@ class UNet:
             stride,
             factor=2,
             padding="SAME",
-            activation=tf.nn.relu,
+            activation=tf.nn.tanh,
             name="conv2d_transpose",
     ):
         with tf.compat.v1.variable_scope(name):
@@ -73,7 +74,8 @@ class UNet:
                 padding=padding,
             )
             biases = tf.Variable(tf.random.normal([X.shape[-1]]))
-            return activation(tf.nn.bias_add(X, biases))
+            activated = activation(tf.nn.bias_add(X, biases))
+            return tf.compat.v1.layers.batch_normalization(activated)
 
     def _crop_concat(self, A, B, name="crop_concat"):
         with tf.compat.v1.variable_scope(name):

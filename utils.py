@@ -10,7 +10,6 @@ class LoggingLevels(Enum):
     INFO = tf.compat.v1.logging.INFO
     WARN = tf.compat.v1.logging.WARN
 
-
 def load_npy(filename):
     assert filename.endswith(".npy"), tf.logging.ERROR(
         "Expected .npy file as input.")
