@@ -1,4 +1,5 @@
 import tensorflow as tf
+import horovod.tensorflow as hvd
 
 from modeling import UNet
 
@@ -17,7 +18,11 @@ def model_fn(features, labels, mode, params):
                   params['num_classes'],
                   is_training=(mode == tf.estimator.ModeKeys.TRAIN)).model
     loss_op = tf.reduce_mean(modified_dice_loss(labels=labels, logits=logits))
-    optimizer = tf.train.AdamOptimizer(learning_rate=params['learning_rate'])
+    optimizer = tf.train.AdamOptimizer(learning_rate=params['learning_rate'] * hvd.size())
+
+    optimizer = hvd.DistributedOptimizer(optimizer)
+    hooks = [hvd.BroadcastGlobalVariablesHook(0)]
+
     train_op = optimizer.minimize(loss_op,
                                   global_step=tf.train.get_global_step())
     predictions = tf.one_hot(indices=tf.argmax(logits, axis=-1),
