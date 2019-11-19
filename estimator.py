@@ -13,7 +13,6 @@ def modified_dice_loss(labels, logits):
     loss = -(2 * intersection / (union))
     return loss
 
-
 def model_fn(features, labels, mode, params):
     logits = UNet(features,
                   params['num_classes'],

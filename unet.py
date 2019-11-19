@@ -1,6 +1,6 @@
 import click
-import tensorflow as tf
 import horovod.tensorflow as hvd
+import tensorflow as tf
 
 from estimator import model_fn
 from utils import load_npy, LoggingLevels
@@ -86,7 +86,6 @@ def cli(ctx, images, labels, logging_level, output_dir, test_steps, batch_size,
         'broadcast_hook': broadcast_hook
     }
 
-
 @cli.command(name="predict")
 @click.pass_context
 def predict(ctx):
@@ -94,11 +93,11 @@ def predict(ctx):
     input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(x=ctx.obj['X'],
                                                             y=ctx.obj['y'],
                                                             shuffle=False)
-
-    # Evaluate the Model
-    for item in ctx.obj['model'].predict(input_fn):
-        print(item)
-
+    
+    # Not implemented due to memory issues with model.predict:
+    #   https://github.com/tensorflow/tensorflow/issues/30885
+    #   https://github.com/tensorflow/tensorflow/issues/32052
+    raise NotImplementedError
 
 @cli.command(name="train")
 @click.pass_context
@@ -117,7 +116,6 @@ def train(ctx):
     ctx.obj['model'].train(input_fn=train_input_fn,
                            steps=num_train_steps // hvd.size(),
                            hooks=[ctx.obj['broadcast_hook']])
-
 
 @cli.command(name="train-and-evaluate")
 @click.pass_context

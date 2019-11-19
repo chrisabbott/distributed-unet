@@ -8,13 +8,10 @@ import ROOT
 from ROOT import TChain
 import sys
 
-np.set_printoptions(threshold=sys.maxsize)
-
 
 @click.group(chain=True)
 def cli():
     pass
-
 
 @cli.command(name="root-to-npy")
 @click.option("--filename", "-i", required=True, help="Path to .root file")
