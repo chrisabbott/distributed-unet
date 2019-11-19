@@ -9,7 +9,7 @@ def modified_dice_loss(labels, logits):
     labels = tf.cast(labels, dtype=tf.float32)
     intersection = tf.reduce_sum(predictions * labels)
     union = eps + tf.reduce_sum(predictions) + tf.reduce_sum(labels)
-    loss = 2 - (2 * intersection / (union))
+    loss = -(2 * intersection / (union))
     return loss
 
 def model_fn(features, labels, mode, params):

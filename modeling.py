@@ -22,7 +22,6 @@ class UNet:
             filters,
             kernel,
             stride,
-            dropout_rate=0.2,
             padding="SAME",
             activation=tf.nn.tanh,
             name="conv2d",
@@ -41,8 +40,7 @@ class UNet:
             )
             biases = tf.Variable(tf.random.normal([X.shape[-1]]))
             activated = activation(tf.nn.bias_add(X, biases))
-            dropout = tf.compat.v1.nn.dropout(activated, rate=dropout_rate)
-            return tf.compat.v1.layers.batch_normalization(dropout)
+            return tf.compat.v1.layers.batch_normalization(activated)
 
     def _conv2d_transpose(
             self,
