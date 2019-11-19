@@ -13,12 +13,14 @@ def modified_dice_loss(labels, logits):
     loss = -(2 * intersection / (union))
     return loss
 
+
 def model_fn(features, labels, mode, params):
     logits = UNet(features,
                   params['num_classes'],
                   is_training=(mode == tf.estimator.ModeKeys.TRAIN)).model
     loss_op = tf.reduce_mean(modified_dice_loss(labels=labels, logits=logits))
-    optimizer = tf.train.AdamOptimizer(learning_rate=params['learning_rate'] * hvd.size())
+    optimizer = tf.train.AdamOptimizer(learning_rate=params['learning_rate'] *
+                                       hvd.size())
 
     optimizer = hvd.DistributedOptimizer(optimizer)
     hooks = [hvd.BroadcastGlobalVariablesHook(0)]

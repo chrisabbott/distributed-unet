@@ -48,12 +48,12 @@ def cli(ctx, images, labels, logging_level, output_dir, test_steps, batch_size,
         learning_rate, epochs, num_classes):
     # Initialize horovod
     hvd.init()
-    
+
     # One GPU per process
     config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
     config.gpu_options.visible_device_list = str(hvd.local_rank())
-    
+
     # Initialize logging and create folders
     tf.compat.v1.logging.set_verbosity(LoggingLevels[logging_level].value)
     tf.io.gfile.makedirs(output_dir)
@@ -138,8 +138,12 @@ def train_and_evaluate(ctx):
     tf.estimator.train_and_evaluate(
         estimator=ctx.obj['model'],
         train_spec=tf.estimator.TrainSpec(input_fn=train_input_fn,
-                                          max_steps=num_train_steps),
-        eval_spec=tf.estimator.EvalSpec(input_fn=eval_input_fn))
+                                          max_steps=num_train_steps //
+                                          hvd.size(),
+                                          hooks=[ctx.obj['broadcast_hook']]),
+        eval_spec=tf.estimator.EvalSpec(input_fn=eval_input_fn,
+                                        steps=ctx.obj['test_steps'],
+                                        hooks=[ctx.obj['broadcast_hook']]))
 
 
 if __name__ == '__main__':
