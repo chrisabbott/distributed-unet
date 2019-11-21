@@ -34,8 +34,9 @@ function pull_dataset {
   echo "Pulling LArTPC semantic segmentation dataset from S3"
 
   # Create data folders
-  mkdir /home/ubuntu/data && chmod -r 777 /home/ubuntu/data
+  mkdir /home/ubuntu/data
   aws s3 cp s3://dlp-semseg/ /home/ubuntu/data --recursive
+  chmod -r 777 /home/ubuntu/data
 }
 
 function set_up_environment {

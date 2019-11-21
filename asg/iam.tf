@@ -28,14 +28,14 @@ resource "aws_iam_policy" "s3_rw_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:ListObjects"
+        "s3:*"
       ],
       "Resource": "arn:aws:s3:::dlp-semseg"
     },
     {
       "Effect": "Allow",
       "Action": [
-        "s3:GetObject"
+        "s3:*"
       ],
       "Resource": "arn:aws:s3:::dlp-semseg/*"
     }
