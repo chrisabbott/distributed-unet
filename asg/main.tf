@@ -13,16 +13,18 @@ resource "aws_autoscaling_group" "training-cluster" {
 }
 
 resource "aws_launch_configuration" "training-cluster" {
-  name            = "training-cluster"
-  image_id        = "${var.ubuntu-dl-base-ami}"
-  instance_type   = "${var.instance-type}"
-  security_groups = ["${aws_security_group.default.id}"]
-  key_name        = "${var.key_name}"
+  name                 = "training-cluster"
+  iam_instance_profile = "${aws_iam_instance_profile.s3_rw_profile.name}"
+  image_id             = "${var.ubuntu-dl-ami}"
+  instance_type        = "${var.instance-type}"
+  security_groups      = ["${aws_security_group.default.id}"]
+  key_name             = "${var.key_name}"
+  user_data            = "${file("init.sh")}"
 }
 
 resource "aws_security_group" "default" {
   name        = "ssh-http-open-outbound"
-  description = "Used in the terraform"
+  description = "Used by training-cluster ASG"
 
   ingress {
     from_port   = 22

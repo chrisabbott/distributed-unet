@@ -2,8 +2,9 @@ variable "aws-region" {
   default = "us-east-1"
 }
 
-variable "ubuntu-dl-base-ami" {
-  default = "ami-063690c75d69a8f15"
+variable "ubuntu-dl-ami" {
+  # Deep Learning AMI (Ubuntu 18.04) Version 25.3
+  default = "ami-0d21095cdfb1566c2"
 }
 
 variable "training-cluster-az" {
@@ -19,11 +20,11 @@ variable "capacity-min" {
 }
 
 variable "capacity-max" {
-  default = 3
+  default = 1
 }
 
 variable "capacity-desired" {
-  default = 2
+  default = 1
 }
 
 variable "key_name" {
