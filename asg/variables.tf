@@ -7,12 +7,12 @@ variable "ubuntu-dl-ami" {
   default = "ami-0d21095cdfb1566c2"
 }
 
-variable "training-cluster-az" {
+variable "unet-training-cluster-az" {
   default = "us-east-1b, us-east-1c, us-east-1d, us-east-1e"
 }
 
 variable "instance-type" {
-  default = "p2.xlarge"
+  default = "t2.nano"
 }
 
 variable "capacity-min" {
