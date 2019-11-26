@@ -30,7 +30,7 @@ class UNet:
             _, _, _, channels = tf.unstack(tf.compat.v1.shape(input_tensor))
             filter = tf.Variable(
                 tf.truncated_normal(
-                    shape=[kernel, kernel, input_tensor.shape[3], filters],
+                    shape=[kernel, kernel, int(input_tensor.shape[3]), filters],
                     stddev=0.1))
             X = tf.nn.conv2d(
                 input=input_tensor,
@@ -38,7 +38,7 @@ class UNet:
                 strides=[1, stride, stride, 1],
                 padding=padding,
             )
-            biases = tf.Variable(tf.random.normal([X.shape[-1]]))
+            biases = tf.Variable(tf.random.normal([int(X.shape[-1])]))
             activated = activation(tf.nn.bias_add(X, biases))
             return tf.compat.v1.layers.batch_normalization(activated)
 
@@ -59,21 +59,21 @@ class UNet:
                 tf.compat.v1.shape(input_tensor))
             filter = tf.Variable(
                 tf.truncated_normal(
-                    shape=[kernel, kernel, filters, input_tensor.shape[3]],
+                    shape=[kernel, kernel, filters, int(input_tensor.shape[3])],
                     stddev=0.1))
             X = tf.nn.conv2d_transpose(
                 input=input_tensor,
                 filters=filter,
                 output_shape=[
                     batch_size,
-                    input_tensor.shape[1] * factor,
-                    input_tensor.shape[2] * factor,
-                    input_tensor.shape[3] // factor,
+                    int(input_tensor.shape[1]) * factor,
+                    int(input_tensor.shape[2]) * factor,
+                    int(input_tensor.shape[3]) // factor,
                 ],
                 strides=[1, stride, stride, 1],
                 padding=padding,
             )
-            biases = tf.Variable(tf.random.normal([X.shape[-1]]))
+            biases = tf.Variable(tf.random.normal([int(X.shape[-1])]))
             activated = activation(tf.nn.bias_add(X, biases))
             return tf.compat.v1.layers.batch_normalization(activated)
 

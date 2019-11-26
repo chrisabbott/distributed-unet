@@ -12,7 +12,7 @@ variable "unet-training-cluster-az" {
 }
 
 variable "instance-type" {
-  default = "t2.nano"
+  default = "p2.xlarge"
 }
 
 variable "capacity-min" {
@@ -20,11 +20,11 @@ variable "capacity-min" {
 }
 
 variable "capacity-max" {
-  default = 1
+  default = 2
 }
 
 variable "capacity-desired" {
-  default = 1
+  default = 2
 }
 
 variable "key_name" {
