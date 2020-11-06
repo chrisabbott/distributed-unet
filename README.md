@@ -9,8 +9,10 @@ This project exists because I wanted to fuse my work experience in data infrastr
 - Create an issue for each point below and start addressing these.
 
 #### Automation
-- Configure some sort of method to allow a user to enter their API keys, so this project can be run by other people without difficulty.
-- Add instructions for deploying and running this project.
+- TODO: Configure some sort of method to allow a user to enter their API keys, so this project can be run by other people without difficulty.
+- TODO: Add instructions for deploying and running this project.
+- TODO: Set up Artifactory and build the Go binary using Jenkins.
+- TODO: Containerize application code using docker and nvidia-docker to make things more reproducible.
 
 #### Rate limiting
 - This worker script will probably result in rate-limiting at scale, because it calls `DescribeInstancesInput` more times than necessary, instead of calling it once and caching the result. This means that when we launch all instances simultaneously, they will all make this API call numerous times, which may be throttled by AWS, causing some instances to fail.
@@ -24,8 +26,7 @@ This project exists because I wanted to fuse my work experience in data infrastr
 
 #### Worker deployment
 - I’m actually downloading the Go compiler and building on each instance right now, which is very much the wrong thing to do. Once I set up Jenkins and Artifactory, I plan to build the binary during CI, host it on Artifactory, and have the workers `wget` the binary in their user data script during initialization.
-- TODO: Set up Artifactory and build the Go binary using Jenkins.
-- TODO: If I eventually want to scale this up to a larger model and dataset, I should consider using Amazon FSx for Lustre to improve read/write speed to the local disk in each worker and to S3.
+- TODO: Consider using Amazon FSx for Lustre to improve read/write speed to the local disk in each worker and to S3.
 - TODO: Consider using Elastic Fabric Adapter to improve network speeds.
 
 #### Modeling and distributed training
@@ -36,4 +37,4 @@ This project exists because I wanted to fuse my work experience in data infrastr
 - TODO: Consider not using TensorFlow and pivoting to PyTorch + Lightning instead.
 - TODO: File format is in .npy, which is somewhat okay, but with larger datasets, potentially with multiple columns, consider using Petastorm and parquet.
 - TODO: Explore different distribution strategies?
-- TODO: Implement gradient compression to halve bandwidth between workers, potentially using float16 (assuming now over/underflow issues) or bfloat16's.
+- TODO: Implement gradient compression to halve bandwidth between workers, potentially using float16 (assuming I don't run into over/underflow issues) or bfloat16's.
